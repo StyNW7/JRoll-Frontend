@@ -45,7 +45,7 @@ export default function AnimatedBackground() {
           speedX: (Math.random() - 0.5) * 0.2,
           speedY: (Math.random() - 0.5) * 0.2,
           opacity: Math.random() * 0.5 + 0.1,
-          color: theme === "dark"
+          color: theme === "dark" || theme === "system"
             ? `rgba(36, 101, 247, ${Math.random() * 0.5 + 0.1})`
             : `rgba(13, 4, 142, ${Math.random() * 0.3 + 0.05})`,
         })
@@ -59,7 +59,7 @@ export default function AnimatedBackground() {
       // Create a gradient background
       const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
 
-      if (theme === "dark") {
+      if (theme === "dark" || theme === "system") {
         gradient.addColorStop(0, "rgba(10, 10, 40, 1)")
         gradient.addColorStop(1, "rgba(20, 20, 50, 1)")
       } else {
@@ -98,7 +98,7 @@ export default function AnimatedBackground() {
 
           if (distance < 100) {
             ctx.beginPath()
-            ctx.strokeStyle = theme === "dark"
+            ctx.strokeStyle = theme === "dark" || theme === "system"
               ? `rgba(36, 101, 255, ${0.1 * (1 - distance / 100)})`
               : `rgba(13, 4, 142, ${0.05 * (1 - distance / 100)})`
             ctx.lineWidth = 0.5
