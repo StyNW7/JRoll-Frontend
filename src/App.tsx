@@ -19,6 +19,12 @@ import NotFoundPage from "./pages/Utility/NotFound404";
 import LandingPage from "@/pages/Landing/page";
 import AboutPage from "./pages/About/page";
 
+// Auth Pages
+
+import WatchingPage from "./pages/Profiles/watching";
+import RegisterPage from "./pages/Auth/register";
+import LoginPage from "./pages/Auth/login";
+
 // Loading Screen Animation
 
 const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
@@ -75,6 +81,10 @@ function App() {
                 <Route path="/about" element={<AboutPage/>} />
 
             </Route>
+
+            <Route path="/login" element={<LoginPage/>} />
+            <Route path="/register" element={<RegisterPage/>} />
+            <Route path="/watching" element={<WatchingPage/>} />
 
           </Routes>
 
