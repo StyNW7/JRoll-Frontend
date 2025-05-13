@@ -8,10 +8,18 @@ import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 
 // Default Pages
+
 import Layout from "@/layouts/root-layout";
 import ScrollToTop from "./utility/ScrollToTop";
 import CustomCursor from "./utility/CustomCursor";
 import ScrollToTopFunction from "./utility/ScrollToTopFunction";
+
+// Util Pages
+
+import TermsOfServicePage from "./pages/Legal/terms";
+import PrivacyPolicyPage from "./pages/Legal/privacy";
+import ContactSupportPage from "./pages/Utility/Contact";
+import FAQPage from "./pages/Utility/FAQ";
 import NotFoundPage from "./pages/Utility/NotFound404";
 
 // Pages
@@ -24,11 +32,14 @@ import AboutPage from "./pages/About/page";
 import WatchingPage from "./pages/Profiles/watching";
 import RegisterPage from "./pages/Auth/register";
 import LoginPage from "./pages/Auth/login";
+import ProfileSettingsPage from "./pages/Profiles/settings";
 
 // Essential Pages
 
 import AnimeDetailPage from "./pages/Anime/[id]/page";
 import SearchPage from "./pages/Search/page";
+import CommentsPage from "./pages/Comments/[id]/page";
+import WatchPage from "./pages/Watch/[id]/page";
 
 // Loading Screen Animation
 
@@ -84,9 +95,18 @@ function App() {
               
                 <Route index element={<LandingPage/>} />
                 <Route path="/about" element={<AboutPage/>} />
+                <Route path="/settings" element={<ProfileSettingsPage/>} />
 
                 <Route path="/search" element={<SearchPage/>} />
+
                 <Route path="/anime/:id" element={<AnimeDetailPage/>} />
+                <Route path="/comments/:id" element={<CommentsPage/>} />
+                <Route path="/watch/:id" element={<WatchPage/>} />
+
+                <Route path="/faq" element={<FAQPage/>} />
+                <Route path="/contact" element={<ContactSupportPage/>} />
+                <Route path="/terms" element={<TermsOfServicePage/>} />
+                <Route path="/privacy" element={<PrivacyPolicyPage/>} />
 
             </Route>
 
