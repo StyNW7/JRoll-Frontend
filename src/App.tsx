@@ -35,7 +35,7 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
       animate={{ opacity: 0 }}
       exit={{ opacity: 1 }}
       transition={{ duration: 1 }}
-      className="fixed inset-0 flex justify-center items-center bg-white z-50"
+      className="fixed inset-0 flex justify-center items-center bg-black z-50"
     >
       <img src={Logo} alt="Loading..." className="w-56 h-56 animate-pulse" />
     </motion.div>
