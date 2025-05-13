@@ -59,7 +59,7 @@ export default function ProfilesPage() {
         <header className="w-full p-4 z-10">
             <div className="container flex justify-between items-center">
             <a href="/" className="flex items-center space-x-2" aria-label="JRoll Homepage">
-                <span className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
+                <span className="text-2xl font-bold">
                 JRoll
                 </span>
             </a>

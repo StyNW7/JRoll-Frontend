@@ -29,7 +29,7 @@ export default function Navbar() {
     { label: "Anime", href: "#anime" },
     { label: "Movies", href: "#movies" },
     { label: "New Releases", href: "#new-releases" },
-    { label: "My List", href: "#my-list" },
+    { label: "Pricing Plan", href: "#pricing" },
   ]
 
   return (

@@ -1,7 +1,6 @@
 import HeroBanner from "@/components/Landing/hero-banner"
 import AnimeRow from "@/components/Landing/anime-row"
 import FeaturesGrid from "@/components/Landing/features-grid"
-import SignupForm from "@/components/Landing/signup-form"
 import SubscriptionCard from "@/components/Landing/subscription-card"
 import GenreCard from "@/components/Landing/genre-card"
 import { Button } from "@/components/ui/button"
@@ -207,6 +206,15 @@ export default function Home() {
     },
   ]
 
+  const specialGenre = [
+    {
+      title: "Subscribe Now!",
+      image: "/Images/Box/genre.png",
+      animeCount: 7777,
+      href: "/register",
+    },
+  ]
+
   return (
     <div className="flex min-h-screen flex-col">
 
@@ -373,13 +381,16 @@ export default function Home() {
                 </li>
               </ul>
               <div className="pt-4">
-                <Button className="rounded-full px-8 bg-primary hover:bg-primary/90 text-white glow-button">
-                  Get Started <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                <a href="/register">
+                  <Button className="rounded-full px-8 bg-primary hover:bg-primary/90 text-white glow-button">
+                    Get Started <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </a>
               </div>
             </div>
             <div>
-              <SignupForm />
+              <GenreCard {...specialGenre[0]} />
+              {/* <SignupForm /> */}
             </div>
           </div>
         </div>

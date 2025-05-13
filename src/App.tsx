@@ -25,6 +25,11 @@ import WatchingPage from "./pages/Profiles/watching";
 import RegisterPage from "./pages/Auth/register";
 import LoginPage from "./pages/Auth/login";
 
+// Essential Pages
+
+import AnimeDetailPage from "./pages/Anime/[id]/page";
+import SearchPage from "./pages/Search/page";
+
 // Loading Screen Animation
 
 const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
@@ -79,6 +84,9 @@ function App() {
               
                 <Route index element={<LandingPage/>} />
                 <Route path="/about" element={<AboutPage/>} />
+
+                <Route path="/search" element={<SearchPage/>} />
+                <Route path="/anime/:id" element={<AnimeDetailPage/>} />
 
             </Route>
 
