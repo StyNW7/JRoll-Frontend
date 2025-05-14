@@ -17,6 +17,7 @@ interface AnimeRowProps {
 }
 
 export default function AnimeRow({ title, animeList }: AnimeRowProps) {
+
   const rowRef = useRef<HTMLDivElement>(null)
   const [showLeftButton, setShowLeftButton] = useState(false)
   const [showRightButton, setShowRightButton] = useState(true)
@@ -48,9 +49,11 @@ export default function AnimeRow({ title, animeList }: AnimeRowProps) {
       <div className="container px-4 md:px-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold">{title}</h2>
-          <Button variant="ghost" className="text-sm" size="sm">
-            View All
-          </Button>
+          <a href="/search">
+            <Button variant="ghost" className="text-sm" size="sm">
+              View All
+            </Button>
+          </a>
         </div>
 
         <div className="relative group">

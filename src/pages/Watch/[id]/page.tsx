@@ -47,8 +47,8 @@ import { useNavigate, useParams } from "react-router"
 const animeData = {
   id: "1",
   title: "Demon Slayer: Mugen Train",
-  image: "/placeholder.svg?height=450&width=300",
-  bannerImage: "/placeholder.svg?height=600&width=1200",
+  image: "/Images/Wallpaper/demon-slayer.png",
+  bannerImage: "/Images/Wallpaper/demon-slayer.png",
   rating: "9.7",
   year: "2021",
   duration: "117 min",
@@ -88,7 +88,7 @@ const animeData = {
       user: {
         id: "u1",
         name: "AnimeExpert",
-        avatar: "/placeholder.svg?height=50&width=50",
+        avatar: "/Images/Avatar/girl-1.png",
       },
       text: "This movie is absolutely stunning! The animation quality is top-notch, and the fight scenes are breathtaking.",
       rating: 5,
@@ -100,7 +100,7 @@ const animeData = {
       user: {
         id: "u2",
         name: "OtakuFan",
-        avatar: "/placeholder.svg?height=50&width=50",
+        avatar: "/Images/Avatar/girl-1.png",
       },
       text: "I was blown away by the animation and music. The story continues perfectly from the series.",
       rating: 4.5,
@@ -112,7 +112,7 @@ const animeData = {
       user: {
         id: "u3",
         name: "AnimeLover22",
-        avatar: "/placeholder.svg?height=50&width=50",
+        avatar: "/Images/Avatar/girl-1.png",
       },
       text: "Rengoku quickly became one of my favorite characters. His dedication and strength are inspiring!",
       rating: 5,
@@ -124,21 +124,21 @@ const animeData = {
     {
       id: "5",
       title: "Jujutsu Kaisen 0",
-      image: "/placeholder.svg?height=450&width=300",
+      image: "/Images/Wallpaper/demon-slayer.png",
       rating: "9.3",
       year: "2021",
     },
     {
       id: "11",
       title: "One Piece Film: Red",
-      image: "/placeholder.svg?height=450&width=300",
+      image: "/Images/Wallpaper/demon-slayer.png",
       rating: "8.8",
       year: "2022",
     },
     {
       id: "8",
       title: "My Hero Academia: Heroes Rising",
-      image: "/placeholder.svg?height=450&width=300",
+      image: "/Images/Wallpaper/demon-slayer.png",
       rating: "8.9",
       year: "2019",
     },
@@ -690,7 +690,7 @@ export default function WatchPage() {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-bold">Comments</h2>
-                  <a href={`/anime/${id}/comments`}>
+                  <a href={`/comments/${id}`}>
                     <Button variant="link" className="p-0 h-auto">
                       View All
                     </Button>

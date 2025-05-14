@@ -26,10 +26,11 @@ export default function Navbar() {
 
   const navItems = [
     { label: "Home", href: "/" },
-    { label: "Anime", href: "#anime" },
-    { label: "Movies", href: "#movies" },
-    { label: "New Releases", href: "#new-releases" },
-    { label: "Pricing Plan", href: "#pricing" },
+    { label: "Anime", href: "/search" },
+    { label: "FAQ", href: "/faq" },
+    { label: "Contact", href: "/contact" },
+    { label: "Watch Now", href: "/watch/1" },
+    { label: "Settings", href: "/settings" },
   ]
 
   return (
@@ -96,7 +97,7 @@ export default function Navbar() {
             asChild
             className="hidden md:flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-full border-0 h-9"
           >
-            <a href="#signup">
+            <a href="/login">
               <User className="h-4 w-4 text-white" />
               <span className="text-sm font-medium">Account</span>
             </a>
@@ -142,7 +143,7 @@ export default function Navbar() {
                     asChild
                     className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-full border-0"
                   >
-                    <a href="#signup" onClick={() => setIsOpen(false)}>
+                    <a href="/login" onClick={() => setIsOpen(false)}>
                       <User className="h-4 w-4 text-white" />
                       <span className="text-sm font-medium">Account</span>
                     </a>

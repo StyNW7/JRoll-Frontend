@@ -309,9 +309,11 @@ export default function AnimeDetailPage() {
                 >
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-2xl font-bold">Comments</h2>
-                    <Button variant="ghost" className="text-sm" size="sm">
-                      View All <ChevronRight className="h-4 w-4 ml-1" />
-                    </Button>
+                    <a href="/comments/1">
+                      <Button variant="ghost" className="text-sm" size="sm">
+                        View All <ChevronRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    </a>
                   </div>
 
                   {/* Top Comment */}

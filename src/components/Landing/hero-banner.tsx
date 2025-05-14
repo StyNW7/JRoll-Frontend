@@ -98,20 +98,28 @@ export default function HeroBanner() {
 
           {/* Action buttons */}
           <div className="flex flex-wrap gap-4">
-            <Button className="rounded-full px-6 py-6 h-12 bg-primary hover:bg-primary/90 text-white glow-button">
-              <Play className="h-5 w-5 mr-2" fill="white" />
-              Play Now
-            </Button>
+
+            <a href="/watch/1">
+              <Button className="rounded-full px-6 py-6 h-12 bg-primary hover:bg-primary/90 text-white glow-button">
+                <Play className="h-5 w-5 mr-2" fill="white" />
+                Play Now
+              </Button>
+            </a>
+
             <Button variant="outline" className="rounded-full px-6 py-6 h-12 border-2 hover:bg-background/50">
               <Plus className="h-5 w-5 mr-2" />
               Add to My List
             </Button>
+
             <Button variant="ghost" className="rounded-full px-6 py-6 h-12 hover:bg-background/50">
               <Info className="h-5 w-5 mr-2" />
               More Info
             </Button>
+
           </div>
+
         </motion.div>
+
 
         {/* Slide indicators */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2">

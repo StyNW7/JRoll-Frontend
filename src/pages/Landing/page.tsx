@@ -172,37 +172,37 @@ export default function Home() {
       title: "Action",
       image: "/Images/Box/genre.png",
       animeCount: 1240,
-      href: "#action",
+      href: "/search",
     },
     {
       title: "Romance",
       image: "/Images/Box/genre.png",
       animeCount: 856,
-      href: "#romance",
+      href: "/search",
     },
     {
       title: "Fantasy",
       image: "/Images/Box/genre.png",
       animeCount: 1120,
-      href: "#fantasy",
+      href: "/search",
     },
     {
       title: "Sci-Fi",
       image: "/Images/Box/genre.png",
       animeCount: 645,
-      href: "#sci-fi",
+      href: "/search",
     },
     {
       title: "Horror",
       image: "/Images/Box/genre.png",
       animeCount: 320,
-      href: "#horror",
+      href: "/search",
     },
     {
       title: "Comedy",
       image: "/Images/Box/genre.png",
       animeCount: 980,
-      href: "#comedy",
+      href: "/search",
     },
   ]
 
@@ -244,9 +244,11 @@ export default function Home() {
         <div className="container px-4 md:px-6">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold">Browse by Genre</h2>
-            <Button variant="ghost" className="text-sm" size="sm">
-              View All Genres
-            </Button>
+            <a href="/search">
+              <Button variant="ghost" className="text-sm" size="sm">
+                View All Genres
+              </Button>
+            </a>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -254,6 +256,7 @@ export default function Home() {
               <GenreCard key={index} {...genre} />
             ))}
           </div>
+
         </div>
       </section>
 

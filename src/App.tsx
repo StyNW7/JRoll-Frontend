@@ -25,7 +25,6 @@ import NotFoundPage from "./pages/Utility/NotFound404";
 // Pages
 
 import LandingPage from "@/pages/Landing/page";
-import AboutPage from "./pages/About/page";
 
 // Auth Pages
 
@@ -89,12 +88,11 @@ function App() {
 
             {/* Default Pages */}
 
-            <Route path="*" element={<NotFoundPage />} />
-
             <Route path="/" element={<Layout />}>
+
+                <Route path="*" element={<NotFoundPage />} />
               
                 <Route index element={<LandingPage/>} />
-                <Route path="/about" element={<AboutPage/>} />
                 <Route path="/settings" element={<ProfileSettingsPage/>} />
 
                 <Route path="/search" element={<SearchPage/>} />
