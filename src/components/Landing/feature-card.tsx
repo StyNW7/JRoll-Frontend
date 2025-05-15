@@ -2,7 +2,7 @@ import { useState } from "react"
 import type { ReactNode } from "react"
 import { motion } from "framer-motion"
 import { Card } from "@/components/ui/card"
-import { useTheme } from "next-themes"
+import { useTheme } from "../theme-provider"
 
 interface FeatureCardProps {
   icon: ReactNode
@@ -19,8 +19,8 @@ export default function FeatureCard({
 }: FeatureCardProps) {
     
   const [isHovered, setIsHovered] = useState(false)
-  const { resolvedTheme } = useTheme()
-  const isDark = resolvedTheme === "dark"
+  const { theme  } = useTheme();
+  const isDark = theme === "dark"
 
   // Adjust accent color opacity for dark mode
   const adjustedAccentColor = isDark
