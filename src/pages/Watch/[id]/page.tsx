@@ -340,8 +340,11 @@ export default function WatchPage() {
   }, [isPlaying, isMuted])
 
   return (
+
     <div className="flex flex-col min-h-screen bg-black">
+
       {/* Video Player */}
+
       <div
         ref={videoContainerRef}
         className="relative w-full bg-black"
@@ -349,6 +352,7 @@ export default function WatchPage() {
         onMouseMove={handleMouseMove}
         onClick={togglePlay}
       >
+
         {/* Video Element */}
         <video
           ref={videoRef}
@@ -361,8 +365,10 @@ export default function WatchPage() {
           onPause={() => setIsPlaying(false)}
         >
           {/* In a real app, you would have actual video sources */}
-          <source src="/video-placeholder.mp4" type="video/mp4" />
+          <source src="/Videos/Movie/JJK.mp4" type="video/mp4" />
+
           Your browser does not support the video tag.
+          
         </video>
 
         {/* Loading Overlay */}
