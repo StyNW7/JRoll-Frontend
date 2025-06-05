@@ -5,6 +5,9 @@ import SubscriptionCard from "@/components/Landing/subscription-card"
 import GenreCard from "@/components/Landing/genre-card"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
+import { useEffect, useState } from "react"
+import { getCollaborativeRecommendations } from "@/utility/api"
+import type { AnimeRecommendation } from "@/utility/api"
 
 export default function Home() {
   // Sample data for trending anime
