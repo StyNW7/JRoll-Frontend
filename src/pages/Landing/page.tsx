@@ -8,57 +8,20 @@ import { ArrowRight } from "lucide-react"
 
 export default function Home() {
   // Sample data for trending anime
-  const trendingAnime = [
-    {
-      title: "Demon Slayer: Kimetsu no Yaiba",
-      image: "/Images/Card/japan.png",
-      rating: "9.8",
-      year: "2023",
-      episodes: 26,
-    },
-    {
-      title: "Attack on Titan: Final Season",
-      image: "/Images/Card/japan.png",
-      rating: "9.7",
-      year: "2023",
-      episodes: 16,
-    },
-    {
-      title: "Jujutsu Kaisen",
-      image: "/Images/Card/japan.png",
-      rating: "9.6",
-      year: "2023",
-      episodes: 24,
-    },
-    {
-      title: "My Hero Academia",
-      image: "/Images/Card/japan.png",
-      rating: "9.5",
-      year: "2023",
-      episodes: 25,
-    },
-    {
-      title: "One Piece",
-      image: "/Images/Card/japan.png",
-      rating: "9.4",
-      year: "2023",
-      episodes: 1000,
-    },
-    {
-      title: "Chainsaw Man",
-      image: "/Images/Card/japan.png",
-      rating: "9.3",
-      year: "2022",
-      episodes: 12,
-    },
-    {
-      title: "Spy x Family",
-      image: "/Images/Card/japan.png",
-      rating: "9.2",
-      year: "2022",
-      episodes: 25,
-    },
-  ]
+  const [trendingAnime, setTrendingAnime] = useState<AnimeRecommendation[]>([])
+
+  useEffect(() => {
+    const fetchTrending = async () => {
+      const recommendations = await getCollaborativeRecommendations(
+        ["One Piece", "Naruto: Shippuuden", "Naruto"], // contoh anime yang ditonton user
+        7
+      )
+      console.log("🎯 API result:", recommendations)
+      setTrendingAnime(recommendations)
+    }
+
+    fetchTrending()
+  }, [])
 
   // Sample data for new releases
   const newReleases = [
