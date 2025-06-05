@@ -1,17 +1,20 @@
 import type React from "react"
 import { useState } from "react"
 import { motion } from "framer-motion"
+import { format } from "date-fns"
+
+// Component Imports from your project
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Eye, EyeOff, Calendar } from "lucide-react"
-import AnimatedBackground from "@/components/util/Animated-Background"
-import ModeToggle from "@/components/theme-toggle"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
-import { format } from "date-fns"
 import { ThemeProvider } from "@/components/theme-provider"
+import AnimatedBackground from "@/components/util/Animated-Background"
+import ModeToggle from "@/components/theme-toggle"
+import { Eye, EyeOff, Calendar, AlertCircle, Loader2, Phone } from "lucide-react" // Added Phone icon
+
 // --- Firebase Imports ---
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import { ref, set, runTransaction } from "firebase/database"
@@ -143,46 +146,63 @@ export default function RegisterPage() {
     }
   }
 
-  return (
-
+ return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-
-        <div className="relative min-h-screen flex flex-col">
-        {/* Animated Background */}
+      <div className="relative min-h-screen flex flex-col">
         <AnimatedBackground />
-
-        {/* Header with logo and theme toggle */}
         <header className="w-full p-4 z-10">
-            <div className="container flex justify-between items-center">
+          <div className="container flex justify-between items-center">
             <a href="/" className="flex items-center space-x-2" aria-label="JRoll Homepage">
-                <span className="text-2xl font-bold">
+              <span className="text-2xl font-bold">
                 JRoll
-                </span>
+              </span>
             </a>
             <ModeToggle />
-            </div>
+          </div>
         </header>
 
-        {/* Main content */}
         <main className="flex-grow flex items-center justify-center p-4 z-10">
-            <motion.div
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="w-full max-w-md"
-            >
+          >
             <div className="bg-background/80 backdrop-blur-md shadow-xl rounded-2xl p-8 border border-primary/10">
-                <div className="text-center mb-8">
+              <div className="text-center mb-8">
                 <h1 className="text-3xl font-bold">Create Your Account</h1>
-                <p className="text-muted-foreground mt-2">Join JRoll and start streaming anime</p>
-                </div>
+                <p className="text-muted-foreground mt-2">
+                 {step === 1 ? "Join JRoll and start streaming anime" : "Join JRoll and start streaming anime"}
+                </p>
+              </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-destructive/10 text-destructive border border-destructive/20 rounded-md p-3 flex items-center space-x-2"
+                  >
+                    <AlertCircle size={18} />
+                    <p className="text-sm font-medium">{error}</p>
+                  </motion.div>
+                )}
+                {successMessage && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-green-500/10 text-green-600 border border-green-500/20 rounded-md p-3 flex items-center space-x-2"
+                  >
+                    <AlertCircle size={18} className="text-green-600"/> {/* Consider a CheckCircle icon here */}
+                    <p className="text-sm font-medium">{successMessage}</p>
+                  </motion.div>
+                )}
+
                 {step === 1 ? (
-                    <>
+                  <>
                     <div className="space-y-2">
-                        <Label htmlFor="fullName">Full Name</Label>
-                        <Input
+                      <Label htmlFor="fullName">Full Name</Label>
+                      <Input
                         id="fullName"
                         type="text"
                         placeholder="John Doe"
@@ -190,12 +210,12 @@ export default function RegisterPage() {
                         onChange={(e) => setFullName(e.target.value)}
                         required
                         className="h-12"
-                        />
+                      />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input
+                      <Label htmlFor="email">Email</Label>
+                      <Input
                         id="email"
                         type="email"
                         placeholder="your@email.com"
@@ -203,135 +223,152 @@ export default function RegisterPage() {
                         onChange={(e) => setEmail(e.target.value)}
                         required
                         className="h-12"
+                      />
+                    </div>
+                    
+                    {/* Phone Number Input Field */}
+                    <div className="space-y-2">
+                      <Label htmlFor="phoneNumber">Phone Number</Label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input
+                          id="phoneNumber"
+                          type="tel" // Use type="tel" for phone numbers
+                          placeholder="e.g., 081234567890"
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          required
+                          className="h-12 pl-10" // Add padding for the icon
                         />
+                      </div>
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="dob">Date of Birth</Label>
-                        <Popover>
+                      <Label htmlFor="dob">Date of Birth</Label>
+                      <Popover>
                         <PopoverTrigger asChild>
-                            <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
+                          <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
                             {date ? format(date, "PPP") : <span className="text-muted-foreground">Pick a date</span>}
                             <Calendar className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
+                          </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
-                            <CalendarComponent
+                          <CalendarComponent
                             mode="single"
                             selected={date}
                             onSelect={setDate}
-                            disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                            disabled={(d) => d > new Date() || d < new Date("1900-01-01")}
                             initialFocus
-                            />
+                          />
                         </PopoverContent>
-                        </Popover>
+                      </Popover>
                     </div>
-                    </>
+                  </>
                 ) : (
-                    <>
+                  <>
                     <div className="space-y-2">
-                        <Label htmlFor="password">Password</Label>
-                        <div className="relative">
+                      <Label htmlFor="password">Password</Label>
+                      <div className="relative">
                         <Input
-                            id="password"
-                            type={showPassword ? "text" : "password"}
-                            placeholder="••••••••"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            className="h-12 pr-10"
+                          id="password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                          className="h-12 pr-10"
                         />
                         <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                            aria-label={showPassword ? "Hide password" : "Show password"}
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          aria-label={showPassword ? "Hide password" : "Show password"}
                         >
-                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">Password must be at least 8 characters long</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">Password must be at least 8 characters long</p>
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="confirmPassword">Confirm Password</Label>
-                        <div className="relative">
+                      <Label htmlFor="confirmPassword">Confirm Password</Label>
+                      <div className="relative">
                         <Input
-                            id="confirmPassword"
-                            type={showConfirmPassword ? "text" : "password"}
-                            placeholder="••••••••"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
-                            className="h-12 pr-10"
+                          id="confirmPassword"
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          required
+                          className="h-12 pr-10"
                         />
                         <button
-                            type="button"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                            aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                         >
-                            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                          {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
-                        </div>
+                      </div>
                     </div>
 
                     <div className="flex items-start space-x-2">
-                        <Checkbox
+                      <Checkbox
                         id="terms"
                         checked={agreeTerms}
                         onCheckedChange={(checked) => setAgreeTerms(checked as boolean)}
                         className="mt-1"
-                        />
-                        <label
+                      />
+                      <label
                         htmlFor="terms"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
+                      >
                         I agree to the{" "}
                         <a href="/terms" className="text-primary hover:underline">
-                            Terms of Service
+                          Terms of Service
                         </a>{" "}
                         and{" "}
                         <a href="/privacy" className="text-primary hover:underline">
-                            Privacy Policy
+                          Privacy Policy
                         </a>
-                        </label>
+                      </label>
                     </div>
-                    </>
+                  </>
                 )}
 
                 <Button
-                    type="submit"
-                    className="w-full h-12 bg-primary hover:bg-primary/90 text-white"
-                    disabled={step === 2 && (!password || !confirmPassword || !agreeTerms || password !== confirmPassword)}
+                  type="submit"
+                  className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center"
+                  disabled={isLoading || (step === 1 && (!fullName.trim() || !email.trim() || !phoneNumber.trim() || !date)) || (step === 2 && (!password || password.length < 8 || password !== confirmPassword || !agreeTerms))}
                 >
-                    {step === 1 ? "Continue" : "Create Account"}
+                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  {isLoading ? "Processing..." : (step === 1 ? "Continue" : "Create Account")}
                 </Button>
 
                 {step === 2 && (
-                    <Button type="button" variant="outline" className="w-full h-12 mt-2" onClick={() => setStep(1)}>
+                  <Button type="button" variant="outline" className="w-full h-12 mt-2" onClick={() => { setError(null); setStep(1);}} disabled={isLoading}>
                     Back
-                    </Button>
+                  </Button>
                 )}
-                </form>
+              </form>
 
-                <div className="mt-6 text-center">
+              <div className="mt-6 text-center">
                 <p className="text-sm text-muted-foreground">
-                    Already have an account?{" "}
-                    <a href="/login" className="text-primary hover:underline font-medium">
+                  Already have an account?{" "}
+                  <a href="/login" className="text-primary hover:underline font-medium">
                     Log in
-                    </a>
+                  </a>
                 </p>
-                </div>
+              </div>
             </div>
-            </motion.div>
+          </motion.div>
         </main>
 
-        {/* Footer */}
         <footer className="w-full p-4 text-center text-sm text-muted-foreground z-10">
-            <p>© {new Date().getFullYear()} JRoll. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} JRoll. All rights reserved.</p>
         </footer>
-        </div>
+      </div>
     </ThemeProvider>
   )
 }
