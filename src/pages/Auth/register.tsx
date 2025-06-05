@@ -12,10 +12,15 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import { ThemeProvider } from "@/components/theme-provider"
+// --- Firebase Imports ---
+import { createUserWithEmailAndPassword } from "firebase/auth"
+import { ref, set, runTransaction } from "firebase/database"
+import { auth, db } from "../../firebase.ts" // Path to your Firebase config
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
+  const [phoneNumber, setPhoneNumber] = useState("") // New state for phone number
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -24,13 +29,117 @@ export default function RegisterPage() {
   const [agreeTerms, setAgreeTerms] = useState(false)
   const [step, setStep] = useState(1)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
+    setSuccessMessage(null);
+
     if (step === 1) {
+      // Added phoneNumber to the check
+      if (!fullName.trim() || !email.trim() || !date || !phoneNumber.trim()) {
+        setError("Please fill out all fields in this step, including phone number.")
+        return
+      }
+      if (!/\S+@\S+\.\S+/.test(email)) {
+        setError("Please enter a valid email address.");
+        return;
+      }
+      // Optional: Basic phone number validation (e.g., only digits, specific length)
+      if (!/^\d{10,15}$/.test(phoneNumber.replace(/\s+/g, ''))) { // Example: 10-15 digits
+          setError("Please enter a valid phone number (10-15 digits).");
+          return;
+      }
       setStep(2)
     } else {
-      // Handle registration logic here
-      console.log({ fullName, email, date, password, confirmPassword, agreeTerms })
+      if (password !== confirmPassword) {
+        setError("Passwords do not match.")
+        return
+      }
+      if (password.length < 8) {
+        setError("Password must be at least 8 characters long.")
+        return
+      }
+      if (!agreeTerms) {
+        setError("You must agree to the terms and privacy policy.")
+        return
+      }
+
+      setIsLoading(true)
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+        const user = userCredential.user
+        console.log("Firebase Auth user created successfully:", user.uid);
+
+        const userCounterRef = ref(db, 'counters/userCount');
+        let newSequentialId: number | null = null;
+
+        await runTransaction(userCounterRef, (currentCount) => {
+          if (currentCount === null) {
+            return 1;
+          }
+          return currentCount + 1;
+        }).then(transactionResult => {
+          if (transactionResult.committed) {
+            newSequentialId = transactionResult.snapshot.val();
+            console.log("New sequential User ID:", newSequentialId);
+          } else {
+            console.error("User ID counter transaction aborted.");
+            throw new Error("Could not assign a user ID. Please try again.");
+          }
+        });
+
+        if (newSequentialId === null) {
+            throw new Error("Failed to retrieve sequential User ID.");
+        }
+
+        const userProfileRef = ref(db, 'Regist/' + user.uid);
+        await set(userProfileRef, {
+          UserID: "ACC" + newSequentialId,
+          fullName: fullName,
+          email: user.email,
+          phoneNumber: phoneNumber, 
+          dateOfBirth: date ? format(date, "dd-MM-yyyy") : null,
+        })
+        
+        console.log("User data saved to Realtime Database with sequential ID.", { uid: user.uid, sequentialId: newSequentialId });
+        setSuccessMessage(`Account created successfully! You can now log in.`);
+        // Reset form
+        setFullName("");
+        setEmail("");
+        setPhoneNumber("");
+        setPassword("");
+        setConfirmPassword("");
+        setDate(undefined);
+        setAgreeTerms(false);
+        setStep(1);
+
+
+      } catch (err: any) {
+        let friendlyMessage = "Failed to create account. Please try again.";
+        if (err.code === 'auth/email-already-in-use') {
+          friendlyMessage = "This email address is already in use."
+        } else if (err.code === 'auth/invalid-email') {
+          friendlyMessage = "The email address is not valid."
+        } else if (err.code === 'auth/weak-password') {
+            friendlyMessage = "Password is too weak. Please choose a stronger one."
+        } else if (err.code === 'auth/operation-not-allowed') {
+            friendlyMessage = "Email/password accounts are not enabled. Check Firebase console."
+        } else if (err.code === 'auth/configuration-not-found') {
+            friendlyMessage = "Firebase configuration error. Check your firebase.ts file and project setup."
+        }
+        else {
+            friendlyMessage = err.message || friendlyMessage;
+        }
+        setError(friendlyMessage);
+        console.error("Registration process error:", err, err.code);
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
 

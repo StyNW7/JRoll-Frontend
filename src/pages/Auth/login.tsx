@@ -6,10 +6,19 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react" // Added AlertCircle, Loader2
 import AnimatedBackground from "@/components/util/Animated-Background"
 import ModeToggle from "@/components/theme-toggle"
 import { ThemeProvider } from "@/components/theme-provider"
+
+// --- Firebase Imports ---
+import { 
+  signInWithEmailAndPassword, 
+  setPersistence, 
+  browserLocalPersistence, // For "Remember Me"
+  browserSessionPersistence // For session-only
+} from "firebase/auth"
+import { auth } from "../../firebase.ts" // Adjust path to your Firebase config
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -17,10 +26,49 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // --- New state for loading and errors ---
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle login logic here
-    console.log({ email, password, rememberMe })
+    setError(null)
+    setSuccessMessage(null)
+    setIsLoading(true)
+
+    try {
+      // Set session persistence based on "Remember Me"
+      // browserLocalPersistence keeps the user signed in even after the browser is closed.
+      // browserSessionPersistence signs the user out when the browser tab/window is closed.
+      await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence)
+      
+      // Sign in the user
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      const user = userCredential.user
+      
+      console.log("User logged in successfully:", user.uid, user.email)
+      setSuccessMessage(`Welcome back, ${user.email}! You are now logged in.`);
+      
+      // Optionally, redirect the user after successful login
+      // For example: window.location.href = '/dashboard'; 
+      // Or use a router if you have one set up in your project.
+
+    } catch (err: any) {
+      let friendlyMessage = "Failed to log in. Please check your credentials."
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        friendlyMessage = "Invalid email or password. Please try again."
+      } else if (err.code === 'auth/invalid-email') {
+        friendlyMessage = "The email address format is not valid."
+      } else if (err.code === 'auth/too-many-requests') {
+        friendlyMessage = "Access to this account has been temporarily disabled due to many failed login attempts. You can try again later or reset your password."
+      }
+      setError(friendlyMessage)
+      console.error("Firebase login error:", err, err.code)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -55,9 +103,33 @@ export default function LoginPage() {
                 <div className="text-center mb-8">
                 <h1 className="text-3xl font-bold">Welcome Back</h1>
                 <p className="text-muted-foreground mt-2">Log in to continue your anime journey</p>
-                </div>
+              </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+              {/* --- Error Message Display --- */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-destructive/10 text-destructive border border-destructive/20 rounded-md p-3 flex items-center space-x-2 mb-6"
+                >
+                  <AlertCircle size={18} />
+                  <p className="text-sm font-medium">{error}</p>
+                </motion.div>
+              )}
+              {/* --- Success Message Display --- */}
+              {successMessage && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-green-500/10 text-green-600 border border-green-500/20 rounded-md p-3 flex items-center space-x-2 mb-6"
+                  >
+                    <AlertCircle size={18} className="text-green-600"/> {/* Consider a CheckCircle icon */}
+                    <p className="text-sm font-medium">{successMessage}</p>
+                  </motion.div>
+                )}
+
+
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
