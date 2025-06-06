@@ -53,6 +53,8 @@ export default function LoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      // console.log("UserCredential : " + user)
+
       // --- Device Verification Step ---
       const userProfileRef = ref(db, 'Regist/' + user.uid);
       const snapshot = await get(userProfileRef);
