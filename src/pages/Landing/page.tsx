@@ -15,10 +15,24 @@ export default function Home() {
 
   useEffect(() => {
     const fetchTrending = async () => {
+
       const recommendations = await getCollaborativeRecommendations(
-        ["One Piece", "Naruto: Shippuuden", "Naruto"], // contoh anime yang ditonton user
+        ["Demon Slayer: Kimetsu no Yaiba", "Attack on Titan", "Bleach"],
         7
       )
+
+      // const recommendations = await getCollaborativeRecommendations(
+      //   ["One Piece", "Naruto: Shippuuden", "Dragon Ball Z"],
+        
+      //   7
+      // )
+
+      // const recommendations = await getCollaborativeRecommendations(
+      //   ["One Piece"],
+        
+      //   7
+      // )
+
       console.log("🎯 API result:", recommendations)
       setTrendingAnime(recommendations)
     }
