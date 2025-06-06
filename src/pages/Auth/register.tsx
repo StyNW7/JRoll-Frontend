@@ -1,82 +1,101 @@
-import type React from "react"
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { format } from "date-fns"
+import type React from "react";
+import { useState } from "react"; // Added useEffect for potential future use
+import { motion } from "framer-motion";
+import { format } from "date-fns";
+import { v4 as uuidv4 } from 'uuid'; // Import UUID generator
 
 // Component Imports from your project
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar as CalendarComponent } from "@/components/ui/calendar"
-import { ThemeProvider } from "@/components/theme-provider"
-import AnimatedBackground from "@/components/util/Animated-Background"
-import ModeToggle from "@/components/theme-toggle"
-import { Eye, EyeOff, Calendar, AlertCircle, Loader2, Phone } from "lucide-react" // Added Phone icon
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { ThemeProvider } from "@/components/theme-provider";
+import AnimatedBackground from "@/components/util/Animated-Background";
+import ModeToggle from "@/components/theme-toggle";
+import { Eye, EyeOff, Calendar, AlertCircle, Loader2, Phone } from "lucide-react";
 
 // --- Firebase Imports ---
-import { createUserWithEmailAndPassword } from "firebase/auth"
-import { ref, set, runTransaction } from "firebase/database"
-import { auth, db } from "../../firebase.ts" // Path to your Firebase config
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { ref, set, runTransaction } from "firebase/database"; // Added serverTimestamp
+import { auth, db } from "../../firebase.ts"; // Path to your Firebase config
+
+const DEVICE_ID_KEY = "app_deviceId"; // Define a constant for localStorage key
 
 export default function RegisterPage() {
-  const [fullName, setFullName] = useState("")
-  const [email, setEmail] = useState("")
-  const [phoneNumber, setPhoneNumber] = useState("") // New state for phone number
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [date, setDate] = useState<Date>()
-  const [agreeTerms, setAgreeTerms] = useState(false)
-  const [step, setStep] = useState(1)
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [date, setDate] = useState<Date>();
+  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [step, setStep] = useState(1);
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
+    e.preventDefault();
+    setError(null);
     setSuccessMessage(null);
 
     if (step === 1) {
-      // Added phoneNumber to the check
       if (!fullName.trim() || !email.trim() || !date || !phoneNumber.trim()) {
-        setError("Please fill out all fields in this step, including phone number.")
-        return
+        setError("Please fill out all fields in this step, including phone number.");
+        return;
       }
       if (!/\S+@\S+\.\S+/.test(email)) {
         setError("Please enter a valid email address.");
         return;
       }
-      // Optional: Basic phone number validation (e.g., only digits, specific length)
-      if (!/^\d{10,15}$/.test(phoneNumber.replace(/\s+/g, ''))) { // Example: 10-15 digits
-          setError("Please enter a valid phone number (10-15 digits).");
-          return;
+      if (!/^\d{10,15}$/.test(phoneNumber.replace(/\s+/g, ''))) {
+        setError("Please enter a valid phone number (10-15 digits).");
+        return;
       }
-      setStep(2)
+      setStep(2);
     } else {
       if (password !== confirmPassword) {
-        setError("Passwords do not match.")
-        return
+        setError("Passwords do not match.");
+        return;
       }
       if (password.length < 8) {
-        setError("Password must be at least 8 characters long.")
-        return
+        setError("Password must be at least 8 characters long.");
+        return;
       }
       if (!agreeTerms) {
-        setError("You must agree to the terms and privacy policy.")
-        return
+        setError("You must agree to the terms and privacy policy.");
+        return;
       }
 
-      setIsLoading(true)
+      setIsLoading(true);
 
       try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-        const user = userCredential.user
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
         console.log("Firebase Auth user created successfully:", user.uid);
+
+        // --- Generate and Store Device ID ---
+        const deviceId = uuidv4();
+        try {
+          localStorage.setItem(DEVICE_ID_KEY, deviceId);
+          console.log("Device ID generated and stored in localStorage:", deviceId);
+        } catch (storageError) {
+          console.error("Error storing deviceId in localStorage:", storageError);
+          setError(
+            "Could not save device identifier. Please ensure your browser supports localStorage and it's enabled. Registration cannot proceed."
+          );
+          setIsLoading(false);
+          // Optional: You might want to delete the created Firebase auth user if device binding is critical
+          // await user.delete(); // This would require careful error handling
+          return; // Stop registration
+        }
+        // --- End Device ID ---
+
 
         const userCounterRef = ref(db, 'counters/userCount');
         let newSequentialId: number | null = null;
@@ -87,30 +106,33 @@ export default function RegisterPage() {
           }
           return currentCount + 1;
         }).then(transactionResult => {
-          if (transactionResult.committed) {
+          if (transactionResult.committed && transactionResult.snapshot.exists()) {
             newSequentialId = transactionResult.snapshot.val();
             console.log("New sequential User ID:", newSequentialId);
           } else {
-            console.error("User ID counter transaction aborted.");
+            console.error("User ID counter transaction aborted or snapshot doesn't exist.");
             throw new Error("Could not assign a user ID. Please try again.");
           }
         });
 
         if (newSequentialId === null) {
-            throw new Error("Failed to retrieve sequential User ID.");
+          // This check might be redundant if the above throw happens, but good for safety.
+          throw new Error("Failed to retrieve sequential User ID.");
         }
 
         const userProfileRef = ref(db, 'Regist/' + user.uid);
         await set(userProfileRef, {
           UserID: "ACC" + newSequentialId,
           fullName: fullName,
-          email: user.email,
-          phoneNumber: phoneNumber, 
+          email: user.email, // Store email from auth user object for consistency
+          phoneNumber: phoneNumber,
           dateOfBirth: date ? format(date, "dd-MM-yyyy") : null,
-        })
+          DeviceId: deviceId, // Store the generated device ID
+        });
         
-        console.log("User data saved to Realtime Database with sequential ID.", { uid: user.uid, sequentialId: newSequentialId });
+        console.log("User data saved to Realtime Database with sequential ID and Device ID.", { uid: user.uid, sequentialId: newSequentialId, deviceId });
         setSuccessMessage(`Account created successfully! You can now log in.`);
+        
         // Reset form
         setFullName("");
         setEmail("");
@@ -121,19 +143,22 @@ export default function RegisterPage() {
         setAgreeTerms(false);
         setStep(1);
 
-
       } catch (err: any) {
         let friendlyMessage = "Failed to create account. Please try again.";
         if (err.code === 'auth/email-already-in-use') {
-          friendlyMessage = "This email address is already in use."
+          friendlyMessage = "This email address is already in use.";
         } else if (err.code === 'auth/invalid-email') {
-          friendlyMessage = "The email address is not valid."
+          friendlyMessage = "The email address is not valid.";
         } else if (err.code === 'auth/weak-password') {
-            friendlyMessage = "Password is too weak. Please choose a stronger one."
+            friendlyMessage = "Password is too weak. Please choose a stronger one.";
         } else if (err.code === 'auth/operation-not-allowed') {
-            friendlyMessage = "Email/password accounts are not enabled. Check Firebase console."
+            friendlyMessage = "Email/password accounts are not enabled. Check Firebase console.";
         } else if (err.code === 'auth/configuration-not-found') {
-            friendlyMessage = "Firebase configuration error. Check your firebase.ts file and project setup."
+            friendlyMessage = "Firebase configuration error. Check your firebase.ts file and project setup.";
+        }
+        // Catch specific errors from deviceId storage or sequential ID generation
+        else if (err.message.startsWith("Could not assign a user ID") || err.message.startsWith("Failed to retrieve sequential User ID")) {
+            friendlyMessage = err.message;
         }
         else {
             friendlyMessage = err.message || friendlyMessage;
@@ -141,10 +166,10 @@ export default function RegisterPage() {
         setError(friendlyMessage);
         console.error("Registration process error:", err, err.code);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
-  }
+  };
 
  return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
@@ -172,7 +197,7 @@ export default function RegisterPage() {
               <div className="text-center mb-8">
                 <h1 className="text-3xl font-bold">Create Your Account</h1>
                 <p className="text-muted-foreground mt-2">
-                 {step === 1 ? "Join JRoll and start streaming anime" : "Join JRoll and start streaming anime"}
+                  {step === 1 ? "Join JRoll and start streaming anime" : "Join JRoll and start streaming anime"}
                 </p>
               </div>
 
@@ -370,5 +395,5 @@ export default function RegisterPage() {
         </footer>
       </div>
     </ThemeProvider>
-  )
+  );
 }
