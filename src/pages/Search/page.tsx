@@ -21,12 +21,13 @@ import {
   SheetFooter,
   SheetClose,
 } from "@/components/ui/sheet"
+import { searchAnime } from "@/utility/api";
+import type { AnimeSearchResult } from "@/utility/api"
 
 import { useNavigate, useSearchParams  } from 'react-router-dom';
 
 // Sample anime data
-const animeData = [
-  {
+const animeData = [{
     id: "1",
     title: "Demon Slayer: Mugen Train",
     image: "/Images/Card/japan.png",
@@ -35,186 +36,20 @@ const animeData = [
     episodes: 1,
     genres: ["Action", "Fantasy", "Adventure"],
     isNew: false,
-  },
-  {
-    id: "2",
-    title: "Your Name",
-    image: "/Images/Card/japan.png",
-    rating: "9.6",
-    year: "2016",
-    episodes: 1,
-    genres: ["Romance", "Fantasy", "Drama"],
-    isNew: false,
-  },
-  {
-    id: "3",
-    title: "Spirited Away",
-    image: "/Images/Card/japan.png",
-    rating: "9.5",
-    year: "2001",
-    episodes: 1,
-    genres: ["Adventure", "Fantasy"],
-    isNew: false,
-  },
-  {
-    id: "4",
-    title: "A Silent Voice",
-    image: "/Images/Card/japan.png",
-    rating: "9.4",
-    year: "2016",
-    episodes: 1,
-    genres: ["Drama", "Romance"],
-    isNew: false,
-  },
-  {
-    id: "5",
-    title: "Jujutsu Kaisen 0",
-    image: "/Images/Card/japan.png",
-    rating: "9.3",
-    year: "2021",
-    episodes: 1,
-    genres: ["Action", "Fantasy", "Horror"],
-    isNew: true,
-  },
-  {
-    id: "6",
-    title: "Weathering With You",
-    image: "/Images/Card/japan.png",
-    rating: "9.2",
-    year: "2019",
-    episodes: 1,
-    genres: ["Romance", "Fantasy", "Drama"],
-    isNew: false,
-  },
-  {
-    id: "7",
-    title: "Princess Mononoke",
-    image: "/Images/Card/japan.png",
-    rating: "9.1",
-    year: "1997",
-    episodes: 1,
-    genres: ["Adventure", "Fantasy"],
-    isNew: false,
-  },
-  {
-    id: "8",
-    title: "My Hero Academia: Heroes Rising",
-    image: "/Images/Card/japan.png",
-    rating: "8.9",
-    year: "2019",
-    episodes: 1,
-    genres: ["Action", "Superhero"],
-    isNew: false,
-  },
-  {
-    id: "9",
-    title: "Violet Evergarden: The Movie",
-    image: "/Images/Card/japan.png",
-    rating: "9.0",
-    year: "2020",
-    episodes: 1,
-    genres: ["Drama", "Fantasy"],
-    isNew: false,
-  },
-  {
-    id: "10",
-    title: "Howl's Moving Castle",
-    image: "/Images/Card/japan.png",
-    rating: "9.0",
-    year: "2004",
-    episodes: 1,
-    genres: ["Adventure", "Fantasy", "Romance"],
-    isNew: false,
-  },
-  {
-    id: "11",
-    title: "One Piece Film: Red",
-    image: "/Images/Card/japan.png",
-    rating: "8.8",
-    year: "2022",
-    episodes: 1,
-    genres: ["Action", "Adventure", "Fantasy"],
-    isNew: true,
-  },
-  {
-    id: "12",
-    title: "Akira",
-    image: "/Images/Card/japan.png",
-    rating: "8.9",
-    year: "1988",
-    episodes: 1,
-    genres: ["Sci-Fi", "Action"],
-    isNew: false,
-  },
-  {
-    id: "13",
-    title: "Ghost in the Shell",
-    image: "/Images/Card/japan.png",
-    rating: "8.7",
-    year: "1995",
-    episodes: 1,
-    genres: ["Sci-Fi", "Action", "Psychological"],
-    isNew: false,
-  },
-  {
-    id: "14",
-    title: "Promare",
-    image: "/Images/Card/japan.png",
-    rating: "8.5",
-    year: "2019",
-    episodes: 1,
-    genres: ["Action", "Sci-Fi", "Mecha"],
-    isNew: false,
-  },
-  {
-    id: "15",
-    title: "Grave of the Fireflies",
-    image: "/Images/Card/japan.png",
-    rating: "9.0",
-    year: "1988",
-    episodes: 1,
-    genres: ["Drama", "War"],
-    isNew: false,
-  },
-  {
-    id: "16",
-    title: "Dragon Ball Super: Broly",
-    image: "/Images/Card/japan.png",
-    rating: "8.7",
-    year: "2018",
-    episodes: 1,
-    genres: ["Action", "Adventure", "Fantasy"],
-    isNew: false,
-  },
-  {
-    id: "17",
-    title: "Paprika",
-    image: "/Images/Card/japan.png",
-    rating: "8.6",
-    year: "2006",
-    episodes: 1,
-    genres: ["Sci-Fi", "Mystery", "Psychological"],
-    isNew: false,
-  },
-  {
-    id: "18",
-    title: "Perfect Blue",
-    image: "/Images/Card/japan.png",
-    rating: "8.8",
-    year: "1997",
-    episodes: 1,
-    genres: ["Psychological", "Horror", "Mystery"],
-    isNew: false,
-  },
-]
+  }]
 
-// Get all unique genres from anime data
+
+
+// // Get all unique genres from anime data
 const allGenres = Array.from(new Set(animeData.flatMap((anime) => anime.genres))).sort()
 
 export default function SearchPage() {
 
   const navigate = useNavigate();
   const [searchParams, ] = useSearchParams();
+
+  const [animeData, setAnimeData] = useState<AnimeSearchResult[]>([])
+  const [loading, setLoading] = useState(false)
 
   // Search and filter states
   const [searchQuery, setSearchQuery] = useState("")
@@ -288,18 +123,28 @@ export default function SearchPage() {
   const paginatedAnime = filteredAnime.slice(startIndex, startIndex + itemsPerPage)
 
   // Handle search submit
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    setCurrentPage(1)
-    // Update URL with search query
-    const params = new URLSearchParams(searchParams.toString())
-    if (searchQuery) {
-      params.set("q", searchQuery)
-    } else {
-      params.delete("q")
-    }
-    navigate(`/search?${params.toString()}`)
+  const handleSearch = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setCurrentPage(1);
+
+  const params = new URLSearchParams(searchParams.toString());
+  if (searchQuery) {
+    params.set("q", searchQuery);
+  } else {
+    params.delete("q");
   }
+  navigate(`/search?${params.toString()}`);
+
+  setLoading(true);
+  try {
+    const results = await searchAnime(searchQuery);
+    setAnimeData(results);
+  } catch (error) {
+    console.error("Search error:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Handle genre toggle
   const toggleGenre = (genre: string) => {
