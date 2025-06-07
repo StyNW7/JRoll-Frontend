@@ -57,7 +57,8 @@ export default function SearchPage() {
   const [yearRange, setYearRange] = useState([1980, new Date().getFullYear()])
   const [minRating, setMinRating] = useState(0)
   const [showNewOnly, setShowNewOnly] = useState(false)
-  const [sortBy, setSortBy] = useState("latest")
+  const [sortBy, setSortBy] = useState("similarity")
+
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1)
@@ -102,20 +103,24 @@ export default function SearchPage() {
 
       return true
     })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case "latest":
-          return Number.parseInt(b.year) - Number.parseInt(a.year)
-        case "oldest":
-          return Number.parseInt(a.year) - Number.parseInt(b.year)
-        case "rating":
-          return Number.parseFloat(b.rating) - Number.parseFloat(a.rating)
-        case "title":
-          return a.title.localeCompare(b.title)
-        default:
-          return 0
-      }
-    })
+    if (sortBy !== "recommendation") {
+      filteredAnime.sort((a, b) => {
+        switch (sortBy) {
+          case "latest":
+            return Number.parseInt(b.year) - Number.parseInt(a.year);
+          case "oldest":
+            return Number.parseInt(a.year) - Number.parseInt(b.year);
+          case "rating":
+            return Number.parseFloat(b.rating) - Number.parseFloat(a.rating);
+          case "title":
+            return a.title.localeCompare(b.title);
+          case "similarity":
+            return (b.similarity_score ?? 0) - (a.similarity_score ?? 0);
+          default:
+            return 0;
+        }
+      });
+    }
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredAnime.length / itemsPerPage)
@@ -510,6 +515,7 @@ export default function SearchPage() {
                         <SelectValue placeholder="Sort by" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="similarity">Most Relevant</SelectItem>
                         <SelectItem value="latest">Latest</SelectItem>
                         <SelectItem value="oldest">Oldest</SelectItem>
                         <SelectItem value="rating">Highest Rated</SelectItem>
