@@ -19,3 +19,46 @@ export async function getCollaborativeRecommendations(
   const result = await response.json();
   return result.recommendations;
 }
+
+
+export interface CommentClassificationResult {
+  isToxic: boolean;
+  label: 'toxic' | 'non-toxic';
+  confidence: number;
+}
+
+// Interface internal untuk mencocokkan respons dari backend
+interface BackendClassificationItem {
+  text: string;
+  predicted_class: 0 | 1;
+  label: 'toxic' | 'non-toxic';
+  confidence: number;
+}
+
+export async function classifyCommentText(
+  commentText: string
+): Promise<CommentClassificationResult> {
+    const response = await fetch("http://127.0.0.1:5000/toxic_classification", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: commentText }),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Server responded with status: ${response.status}`);
+    }
+
+    const resultsArray: BackendClassificationItem[] = await response.json();
+
+    if (!resultsArray || resultsArray.length === 0) {
+      throw new Error("API did not return any classification results.");
+    }
+    const firstResult = resultsArray[0];
+
+    return {
+      isToxic: firstResult.label === 'toxic', 
+      label: firstResult.label,
+      confidence: firstResult.confidence,
+    };
+}
