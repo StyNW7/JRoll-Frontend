@@ -75,9 +75,9 @@ export default function SearchPage() {
   const filteredAnime = animeData
     .filter((anime) => {
       // Search query filter
-      if (searchQuery && !anime.title.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return false
-      }
+      // if (searchQuery && !anime.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+      //   return false
+      // }
 
       // Genre filter
       if (selectedGenres.length > 0 && !selectedGenres.some((genre) => anime.genres.includes(genre))) {
