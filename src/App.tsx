@@ -40,6 +40,8 @@ import SearchPage from "./pages/Search/page";
 import CommentsPage from "./pages/Comments/[id]/page";
 import WatchPage from "./pages/Watch/[id]/page";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+
 // Loading Screen Animation
 
 const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
@@ -93,13 +95,24 @@ function App() {
                 <Route path="*" element={<NotFoundPage />} />
               
                 <Route index element={<LandingPage/>} />
-                <Route path="/settings" element={<ProfileSettingsPage/>} />
+
+                <Route path="/settings" element={
+                  <ProtectedRoute>
+                    <ProfileSettingsPage/>
+                  </ProtectedRoute>
+                } />
 
                 <Route path="/search" element={<SearchPage/>} />
 
                 <Route path="/anime/:id" element={<AnimeDetailPage/>} />
+
                 <Route path="/comments/:id" element={<CommentsPage/>} />
-                <Route path="/watch/:id" element={<WatchPage/>} />
+
+                <Route path="/watch/:id" element={
+                  <ProtectedRoute>
+                    <WatchPage/>
+                  </ProtectedRoute>
+                } />
 
                 <Route path="/faq" element={<FAQPage/>} />
                 <Route path="/contact" element={<ContactSupportPage/>} />
@@ -110,7 +123,13 @@ function App() {
 
             <Route path="/login" element={<LoginPage/>} />
             <Route path="/register" element={<RegisterPage/>} />
-            <Route path="/watching" element={<WatchingPage/>} />
+
+            <Route path="/watching" element={
+              <ProtectedRoute>
+                <WatchingPage/>
+              </ProtectedRoute>
+              
+            } />
 
           </Routes>
 

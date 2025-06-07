@@ -212,7 +212,8 @@ export default function AnimeDetailPage() {
 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-3 mt-4">
-                  <Button className="rounded-full px-6 py-6 h-12 bg-primary hover:bg-primary/90 text-white">
+                  <Button className="rounded-full px-6 py-6 h-12 bg-primary hover:bg-primary/90 text-white" 
+                    onClick={() => navigate("/watch/1")}>
                     <Play className="h-5 w-5 mr-2" fill="white" />
                     Watch Now
                   </Button>

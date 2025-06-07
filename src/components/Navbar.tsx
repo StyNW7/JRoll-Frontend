@@ -1,14 +1,18 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Menu, Search, Bell, User } from "lucide-react"
+import { Menu, User } from "lucide-react"
 import ModeToggle from "@/components/theme-toggle"
-import { Input } from "@/components/ui/input"
+import { useAuth } from "@/hooks/useAuth"
+import { signOut } from 'firebase/auth';
+import { auth } from '@/firebase'; 
 
 export default function Navbar() {
+
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  // const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   // Handle scroll effect for navbar
   useEffect(() => {
@@ -59,7 +63,7 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          {isSearchOpen ? (
+          {/* {isSearchOpen ? (
             <div className="relative hidden md:block">
               <Input
                 type="search"
@@ -89,7 +93,7 @@ export default function Navbar() {
             aria-label="Notifications"
           >
             <Bell className="h-4 w-4" />
-          </Button>
+          </Button> */}
 
           <ModeToggle />
 
@@ -97,11 +101,45 @@ export default function Navbar() {
             asChild
             className="hidden md:flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-full border-0 h-9"
           >
-            <a href="/login">
-              <User className="h-4 w-4 text-white" />
-              <span className="text-sm font-medium">Account</span>
-            </a>
+            {user ? (
+
+              <a href="/settings">
+                <User className="h-4 w-4 text-white" />
+                <span className="text-sm font-medium">Account</span>
+              </a>
+
+            )
+
+            : 
+
+            (
+
+              <a href="/login">
+                <User className="h-4 w-4 text-white" />
+                <span className="text-sm font-medium">Account</span>
+              </a>
+
+            )
+
+            }
+            
           </Button>
+
+          {user && (
+            <Button
+              onClick={async () => {
+                try {
+                  await signOut(auth);
+                  window.location.href = '/login'; // redirect to login
+                } catch (error) {
+                  console.error('Logout failed:', error);
+                }
+              }}
+              className="hidden md:flex items-center gap-2 text-white border-0 h-9"
+            >
+              <span className="text-sm font-medium">Logout</span>
+            </Button>
+          )}
 
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild className="md:hidden">
@@ -117,14 +155,14 @@ export default function Navbar() {
                 </span>
               </div>
 
-              <div className="relative mb-6">
+              {/* <div className="relative mb-6">
                 <Input
                   type="search"
                   placeholder="Search anime..."
                   className="w-full rounded-full bg-muted/50 border-primary/20"
                 />
                 <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              </div>
+              </div> */}
 
               <nav className="flex flex-col gap-4" aria-label="Mobile Navigation">
                 {navItems.map((item, index) => (

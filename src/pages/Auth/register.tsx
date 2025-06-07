@@ -20,10 +20,14 @@ import { Eye, EyeOff, Calendar, AlertCircle, Loader2, Phone } from "lucide-react
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { ref, set, runTransaction } from "firebase/database"; // Added serverTimestamp
 import { auth, db } from "../../firebase.ts"; // Path to your Firebase config
+import { useNavigate } from "react-router";
 
 const DEVICE_ID_KEY = "app_deviceId"; // Define a constant for localStorage key
 
 export default function RegisterPage() {
+
+  const navigate = useNavigate()
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -142,6 +146,10 @@ export default function RegisterPage() {
         setDate(undefined);
         setAgreeTerms(false);
         setStep(1);
+
+        setInterval(() => {
+            navigate("/login")
+        }, 1500);
 
       } catch (err: any) {
         let friendlyMessage = "Failed to create account. Please try again.";

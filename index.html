@@ -1,13 +1,194 @@
 <!doctype html>
 <html lang="en">
   <head>
+
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/Images/logo-bg.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>JRoll</title>
+
+    <style>
+      #antiScreenshot {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 1);
+        color: red;
+        font-size: 3rem;
+        font-weight: bold;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease-in-out;
+        z-index: 999999;
+      }
+
+      #countdown {
+        font-size: 2rem;
+        color: white;
+        margin-top: 1rem;
+      }
+    </style>
+
   </head>
+
   <body>
+
+    <div id="antiScreenshot">
+      Don't screenshot please :(
+      <div id="countdown"></div>
+      <div id="banned"></div>
+    </div>
+
     <div id="root"></div>
+
     <script type="module" src="/src/main.tsx"></script>
+
+    <script type="module">
+
+      import { signOut } from "firebase/auth";
+      import { auth } from "@/firebase";
+
+      const overlay = document.getElementById('antiScreenshot');
+      const countdownText = document.getElementById('countdown');
+      const bannedText = document.getElementById('banned');
+
+      const baseDelay = 3000; // 3 detik
+      const maxDelay = 300000; // 5 menit
+      let strikeCount = parseInt(getCookie("strikeCount")) || 0;
+      let countdownInterval;
+
+      async function activateOverlay() {
+
+        strikeCount++;
+
+        if (strikeCount >= 7) {
+          await bannedUserAccount();
+          return;
+        }
+
+        const delay = Math.min(baseDelay * Math.pow(2, strikeCount - 1), maxDelay);
+        setCookie("strikeCount", strikeCount, 1); // disimpan 1 hari
+
+        if (overlay) {
+          overlay.style.opacity = '1';
+          let remainingTime = Math.floor(delay / 1000); // dalam detik
+          setCookie("remainingTime", remainingTime, 1);
+
+          updateCountdown(remainingTime);
+          countdownInterval = setInterval(() => {
+            remainingTime--;
+            updateCountdown(remainingTime);
+            setCookie("remainingTime", remainingTime, 1);
+
+            if (remainingTime <= 0) {
+              clearInterval(countdownInterval);
+              overlay.style.opacity = '0';
+              setCookie("remainingTime", 0, 1);
+            }
+          }, 1000);
+        }
+      }
+
+      async function bannedUserAccount(){
+        try {
+          await signOut(auth);
+          localStorage.removeItem("app_deviceId");
+          window.location.href = '/login';
+          redeemer();
+        } catch (error) {
+          console.error('Logout failed:', error);
+        }
+      }
+
+      function updateCountdown(seconds) {
+        if (countdownText) {
+          countdownText.textContent = `This screen will disappear in ${seconds}s`;
+        }
+        if (bannedText) {
+          bannedText.textContent = `Your account will be deactivate if try ${7-strikeCount} screenshot again`;
+        }
+      }
+
+      // Reaktifasi countdown jika masih tersisa saat refresh
+      window.addEventListener("load", () => {
+        const storedTime = parseInt(getCookie("remainingTime"));
+        if (storedTime > 0) {
+          if (overlay) {
+            overlay.style.opacity = '1';
+            updateCountdown(storedTime);
+            let remainingTime = storedTime;
+            countdownInterval = setInterval(() => {
+              remainingTime--;
+              updateCountdown(remainingTime);
+              setCookie("remainingTime", remainingTime, 1);
+              if (remainingTime <= 0) {
+                clearInterval(countdownInterval);
+                overlay.style.opacity = '0';
+                setCookie("remainingTime", 0, 1);
+              }
+            }, 1000);
+          }
+        }
+      });
+
+      // Tombol PrintScreen
+      document.addEventListener('keyup', function(e) {
+        if (e.key === 'PrintScreen') {
+          navigator.clipboard.writeText('');
+          activateOverlay();
+        }
+        if (e.key === 'Escape') {
+          redeemer();
+        }
+      });
+
+      function redeemer(){
+        strikeCount = 0;
+        clearInterval(countdownInterval);
+        overlay.style.opacity = '0';
+        deleteCookie("strikeCount");
+        deleteCookie("remainingTime");
+        countdownText.textContent = '';
+      }
+
+      // Shortcut DevTools dan Ctrl+ combo
+      // document.addEventListener("contextmenu", e => e.preventDefault());
+      // document.addEventListener("keydown", e => {
+      //   if (
+      //     e.ctrlKey && (e.key === "s" || e.key === "u" || e.key === "p") ||
+      //     e.key === "F12" || e.key === "Meta" || e.key === "OS"
+      //   ) {
+      //     e.preventDefault();
+      //     activateOverlay();
+      //   }
+      // });
+
+      // Cookie utilities
+      function setCookie(name, value, days) {
+        const expires = new Date(Date.now() + days * 864e5).toUTCString();
+        document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/';
+      }
+
+      function getCookie(name) {
+        return document.cookie.split('; ').reduce((r, v) => {
+          const parts = v.split('=');
+          return parts[0] === name ? decodeURIComponent(parts[1]) : r
+        }, '');
+      }
+
+      function deleteCookie(name) {
+        document.cookie = name + '=; Max-Age=0; path=/';
+      }
+
+    </script>
+
   </body>
+
 </html>
