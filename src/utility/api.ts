@@ -20,6 +20,27 @@ export async function getCollaborativeRecommendations(
   return result.recommendations;
 }
 
+export interface AnimeSearchResult {
+  id: number
+  title: string
+  image: string
+  rating: string
+  year: string
+  episodes: number
+  genres: string[]
+  isNew: boolean
+}
+export async function searchAnime(title: string): Promise<AnimeSearchResult[]> {
+  const response = await fetch("http://127.0.0.1:5000/recommend_anime", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title }),
+  })
+
+  if (!response.ok) throw new Error("Failed to fetch anime recommendations")
+  const result = await response.json()
+  return result.recommendations
+}
 
 export interface CommentClassificationResult {
   isToxic: boolean;
