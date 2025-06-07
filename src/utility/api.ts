@@ -29,6 +29,7 @@ export interface AnimeSearchResult {
   episodes: number
   genres: string[]
   isNew: boolean
+  similarity_score: number
 }
 export async function searchAnime(title: string): Promise<AnimeSearchResult[]> {
   const response = await fetch("http://127.0.0.1:5000/recommend_anime", {
