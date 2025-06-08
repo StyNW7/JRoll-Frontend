@@ -49,7 +49,7 @@ export default function SearchPage() {
   const [searchParams, ] = useSearchParams();
 
   const [animeData, setAnimeData] = useState<AnimeSearchResult[]>([])
-  const [loading, setLoading] = useState(false)
+  const [, setLoading] = useState(false)
 
   // Search and filter states
   const [searchQuery, setSearchQuery] = useState("")
