@@ -373,12 +373,12 @@ export default function CommentsPage() {
       if (classificationResult.isToxic) {
         setSubmitMessage({
           type: "moderation",
-          text: `Komentar Anda terdeteksi sebagai "${classificationResult.label}". Konten ini akan disembunyikan jika filter "Hide Toxic" aktif.`,
+          text: `Your comment detected as "${classificationResult.label}". This comment will be hide when "Hide Toxic" toggle active.`,
         });
       } else {
         setSubmitMessage({
           type: "success",
-          text: "Review Anda berhasil diposting!",
+          text: "Your review post successfully",
         });
       }
 
