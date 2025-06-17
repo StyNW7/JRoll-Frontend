@@ -241,7 +241,7 @@ export default function SearchPage() {
   const [animeData, setAnimeData] = useState<AnimeSearchResult[]>(defaultAnimeData)
   const allGenres = Array.from(new Set(animeData.flatMap((anime) => anime.genres))).sort()
 
-  const [loading, setLoading] = useState(false)
+  const [, setLoading] = useState(false)
 
   // Search and filter states
   const [searchQuery, setSearchQuery] = useState("")
